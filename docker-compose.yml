@@ -1,0 +1,70 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: lingua_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: linguaroot123
+      MYSQL_DATABASE: lingua_db
+      MYSQL_USER: lingua_user
+      MYSQL_PASSWORD: lingua_pass123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./migrations/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: lingua_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  api:
+    build: .
+    container_name: lingua_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: lingua_db
+      DB_USER: lingua_user
+      DB_PASS: lingua_pass123
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: lingua_jwt_secret_change_in_prod_2026
+      JWT_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+      OPENROUTER_API_KEY: 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
+      OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
+      AI_MODEL: openai/gpt-4o
+      PORT: 3000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mysql_data:
+  redis_data:
