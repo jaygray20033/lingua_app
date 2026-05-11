@@ -1,0 +1,146 @@
+-- =====================================================
+-- SEED: Vocabulary - English (CEFR A1 → C1, IELTS, TOEIC)
+-- Nguồn tham khảo: Oxford 3000/5000, CEFR-J wordlist, COCA frequency.
+-- Cấp IELTS: ~ B2-C1; TOEIC business: B1-B2.
+-- =====================================================
+
+SET NAMES utf8mb4;
+SET @en := (SELECT id FROM languages WHERE code='en');
+
+-- ========== A1/A2 (Beginner — TOEIC 250-450) ==========
+INSERT INTO words (language_id, `text`, reading, romaji, pos, cefr_level, frequency_rank, meaning_vi, meaning_en) VALUES
+(@en, 'family', '/ˈfæməli/', 'family', 'NOUN', 'A1', 1, 'gia đình', 'a group of related people'),
+(@en, 'house', '/haʊs/', 'house', 'NOUN', 'A1', 2, 'ngôi nhà', 'a building for living'),
+(@en, 'school', '/skuːl/', 'school', 'NOUN', 'A1', 3, 'trường học', 'place for education'),
+(@en, 'work', '/wɜːrk/', 'work', 'VERB', 'A1', 4, 'làm việc', 'to perform a job'),
+(@en, 'food', '/fuːd/', 'food', 'NOUN', 'A1', 5, 'thức ăn', 'something to eat'),
+(@en, 'water', '/ˈwɔːtər/', 'water', 'NOUN', 'A1', 6, 'nước', 'liquid we drink'),
+(@en, 'friend', '/frend/', 'friend', 'NOUN', 'A1', 7, 'bạn bè', 'a person you like'),
+(@en, 'love', '/lʌv/', 'love', 'VERB', 'A1', 8, 'yêu', 'strong feeling of affection'),
+(@en, 'happy', '/ˈhæpi/', 'happy', 'ADJ', 'A1', 9, 'vui vẻ', 'feeling pleasure'),
+(@en, 'sad', '/sæd/', 'sad', 'ADJ', 'A1', 10, 'buồn', 'feeling unhappy'),
+(@en, 'big', '/bɪɡ/', 'big', 'ADJ', 'A1', 11, 'to lớn', 'large in size'),
+(@en, 'small', '/smɔːl/', 'small', 'ADJ', 'A1', 12, 'nhỏ', 'little in size'),
+(@en, 'morning', '/ˈmɔːrnɪŋ/', 'morning', 'NOUN', 'A1', 13, 'buổi sáng', 'early part of day'),
+(@en, 'night', '/naɪt/', 'night', 'NOUN', 'A1', 14, 'ban đêm', 'time when it is dark'),
+(@en, 'today', '/təˈdeɪ/', 'today', 'NOUN', 'A1', 15, 'hôm nay', 'this day'),
+(@en, 'eat', '/iːt/', 'eat', 'VERB', 'A1', 16, 'ăn', 'to take food'),
+(@en, 'drink', '/drɪŋk/', 'drink', 'VERB', 'A1', 17, 'uống', 'to take liquid'),
+(@en, 'sleep', '/sliːp/', 'sleep', 'VERB', 'A1', 18, 'ngủ', 'to rest with closed eyes'),
+(@en, 'go', '/ɡoʊ/', 'go', 'VERB', 'A1', 19, 'đi', 'to move from a place'),
+(@en, 'come', '/kʌm/', 'come', 'VERB', 'A1', 20, 'đến', 'to move to here'),
+(@en, 'good', '/ɡʊd/', 'good', 'ADJ', 'A1', 21, 'tốt', 'pleasant or right'),
+(@en, 'bad', '/bæd/', 'bad', 'ADJ', 'A1', 22, 'xấu, tệ', 'not good'),
+(@en, 'help', '/help/', 'help', 'VERB', 'A1', 23, 'giúp đỡ', 'to assist someone'),
+(@en, 'understand', '/ˌʌndərˈstænd/', 'understand', 'VERB', 'A2', 24, 'hiểu', 'to comprehend'),
+(@en, 'remember', '/rɪˈmembər/', 'remember', 'VERB', 'A2', 25, 'nhớ', 'to keep in mind'),
+(@en, 'forget', '/fərˈɡet/', 'forget', 'VERB', 'A2', 26, 'quên', 'fail to remember'),
+(@en, 'believe', '/bɪˈliːv/', 'believe', 'VERB', 'A2', 27, 'tin tưởng', 'to accept as true'),
+(@en, 'expensive', '/ɪkˈspensɪv/', 'expensive', 'ADJ', 'A2', 28, 'đắt', 'costing much'),
+(@en, 'cheap', '/tʃiːp/', 'cheap', 'ADJ', 'A2', 29, 'rẻ', 'low in price'),
+(@en, 'beautiful', '/ˈbjuːtɪfl/', 'beautiful', 'ADJ', 'A2', 30, 'đẹp', 'pleasing to senses');
+
+-- ========== B1/B2 (Intermediate — TOEIC 500-750, IELTS 5.0-6.5) ==========
+INSERT INTO words (language_id, `text`, reading, romaji, pos, cefr_level, frequency_rank, meaning_vi, meaning_en) VALUES
+(@en, 'achievement', '/əˈtʃiːvmənt/', 'achievement', 'NOUN', 'B1', 100, 'thành tựu', 'something accomplished'),
+(@en, 'opportunity', '/ˌɑːpərˈtuːnəti/', 'opportunity', 'NOUN', 'B1', 101, 'cơ hội', 'a chance for advancement'),
+(@en, 'experience', '/ɪkˈspɪriəns/', 'experience', 'NOUN', 'B1', 102, 'kinh nghiệm', 'knowledge from doing'),
+(@en, 'environment', '/ɪnˈvaɪrənmənt/', 'environment', 'NOUN', 'B1', 103, 'môi trường', 'surroundings'),
+(@en, 'culture', '/ˈkʌltʃər/', 'culture', 'NOUN', 'B1', 104, 'văn hóa', 'beliefs and customs'),
+(@en, 'society', '/səˈsaɪəti/', 'society', 'NOUN', 'B1', 105, 'xã hội', 'community of people'),
+(@en, 'government', '/ˈɡʌvərnmənt/', 'government', 'NOUN', 'B1', 106, 'chính phủ', 'governing body'),
+(@en, 'economy', '/ɪˈkɑːnəmi/', 'economy', 'NOUN', 'B1', 107, 'kinh tế', 'state of finances'),
+(@en, 'education', '/ˌedʒuˈkeɪʃn/', 'education', 'NOUN', 'B1', 108, 'giáo dục', 'process of learning'),
+(@en, 'technology', '/tekˈnɑːlədʒi/', 'technology', 'NOUN', 'B1', 109, 'công nghệ', 'application of science'),
+(@en, 'develop', '/dɪˈveləp/', 'develop', 'VERB', 'B1', 110, 'phát triển', 'to grow or improve'),
+(@en, 'consider', '/kənˈsɪdər/', 'consider', 'VERB', 'B1', 111, 'xem xét', 'to think about'),
+(@en, 'suggest', '/səˈdʒest/', 'suggest', 'VERB', 'B1', 112, 'đề xuất', 'to propose'),
+(@en, 'improve', '/ɪmˈpruːv/', 'improve', 'VERB', 'B1', 113, 'cải thiện', 'to make better'),
+(@en, 'achieve', '/əˈtʃiːv/', 'achieve', 'VERB', 'B1', 114, 'đạt được', 'to succeed in doing'),
+(@en, 'maintain', '/meɪnˈteɪn/', 'maintain', 'VERB', 'B1', 115, 'duy trì', 'to keep up'),
+(@en, 'establish', '/ɪˈstæblɪʃ/', 'establish', 'VERB', 'B2', 116, 'thiết lập', 'to set up'),
+(@en, 'demonstrate', '/ˈdemənstreɪt/', 'demonstrate', 'VERB', 'B2', 117, 'chứng minh', 'to show clearly'),
+(@en, 'investigate', '/ɪnˈvestɪɡeɪt/', 'investigate', 'VERB', 'B2', 118, 'điều tra', 'to examine'),
+(@en, 'analyze', '/ˈænəlaɪz/', 'analyze', 'VERB', 'B2', 119, 'phân tích', 'to study in detail'),
+(@en, 'significant', '/sɪɡˈnɪfɪkənt/', 'significant', 'ADJ', 'B2', 120, 'có ý nghĩa', 'important'),
+(@en, 'sufficient', '/səˈfɪʃnt/', 'sufficient', 'ADJ', 'B2', 121, 'đủ', 'enough'),
+(@en, 'efficient', '/ɪˈfɪʃnt/', 'efficient', 'ADJ', 'B2', 122, 'hiệu quả', 'working well'),
+(@en, 'reliable', '/rɪˈlaɪəbl/', 'reliable', 'ADJ', 'B2', 123, 'đáng tin cậy', 'can be trusted'),
+(@en, 'flexible', '/ˈfleksəbl/', 'flexible', 'ADJ', 'B2', 124, 'linh hoạt', 'able to bend'),
+(@en, 'sustainable', '/səˈsteɪnəbl/', 'sustainable', 'ADJ', 'B2', 125, 'bền vững', 'able to maintain'),
+(@en, 'controversial', '/ˌkɑːntrəˈvɜːrʃl/', 'controversial', 'ADJ', 'B2', 126, 'gây tranh cãi', 'causing dispute'),
+(@en, 'comprehensive', '/ˌkɑːmprɪˈhensɪv/', 'comprehensive', 'ADJ', 'B2', 127, 'toàn diện', 'including all'),
+(@en, 'inevitable', '/ɪnˈevɪtəbl/', 'inevitable', 'ADJ', 'B2', 128, 'không tránh khỏi', 'unavoidable'),
+(@en, 'consequence', '/ˈkɑːnsəkwens/', 'consequence', 'NOUN', 'B2', 129, 'hậu quả', 'a result'),
+(@en, 'phenomenon', '/fəˈnɑːmɪnən/', 'phenomenon', 'NOUN', 'B2', 130, 'hiện tượng', 'observable event'),
+(@en, 'perspective', '/pərˈspektɪv/', 'perspective', 'NOUN', 'B2', 131, 'quan điểm', 'point of view'),
+(@en, 'regulation', '/ˌreɡjuˈleɪʃn/', 'regulation', 'NOUN', 'B2', 132, 'quy định', 'rule made by authority'),
+(@en, 'infrastructure', '/ˈɪnfrəstrʌktʃər/', 'infrastructure', 'NOUN', 'B2', 133, 'cơ sở hạ tầng', 'basic facilities'),
+(@en, 'controversy', '/ˈkɑːntrəvɜːrsi/', 'controversy', 'NOUN', 'B2', 134, 'tranh cãi', 'public dispute'),
+(@en, 'allocate', '/ˈæləkeɪt/', 'allocate', 'VERB', 'B2', 135, 'phân bổ', 'to distribute'),
+(@en, 'collaborate', '/kəˈlæbəreɪt/', 'collaborate', 'VERB', 'B2', 136, 'hợp tác', 'to work together'),
+(@en, 'implement', '/ˈɪmplɪment/', 'implement', 'VERB', 'B2', 137, 'thực hiện', 'to put into effect'),
+(@en, 'negotiate', '/nɪˈɡoʊʃieɪt/', 'negotiate', 'VERB', 'B2', 138, 'đàm phán', 'to discuss to reach agreement'),
+(@en, 'acquire', '/əˈkwaɪər/', 'acquire', 'VERB', 'B2', 139, 'thu được', 'to get'),
+(@en, 'evaluate', '/ɪˈvæljueɪt/', 'evaluate', 'VERB', 'B2', 140, 'đánh giá', 'to judge value');
+
+-- ========== TOEIC Business (B1-B2) ==========
+INSERT INTO words (language_id, `text`, reading, romaji, pos, cefr_level, frequency_rank, meaning_vi, meaning_en) VALUES
+(@en, 'invoice', '/ˈɪnvɔɪs/', 'invoice', 'NOUN', 'B1', 200, 'hóa đơn', 'a bill for goods/services'),
+(@en, 'budget', '/ˈbʌdʒɪt/', 'budget', 'NOUN', 'B1', 201, 'ngân sách', 'plan of income/expenses'),
+(@en, 'revenue', '/ˈrevənuː/', 'revenue', 'NOUN', 'B2', 202, 'doanh thu', 'income from business'),
+(@en, 'profit', '/ˈprɑːfɪt/', 'profit', 'NOUN', 'B1', 203, 'lợi nhuận', 'financial gain'),
+(@en, 'expense', '/ɪkˈspens/', 'expense', 'NOUN', 'B1', 204, 'chi phí', 'cost'),
+(@en, 'shareholder', '/ˈʃerhoʊldər/', 'shareholder', 'NOUN', 'B2', 205, 'cổ đông', 'owner of stock'),
+(@en, 'merger', '/ˈmɜːrdʒər/', 'merger', 'NOUN', 'B2', 206, 'sáp nhập', 'combining of companies'),
+(@en, 'acquisition', '/ˌækwɪˈzɪʃn/', 'acquisition', 'NOUN', 'B2', 207, 'sự thâu tóm', 'act of acquiring'),
+(@en, 'recruit', '/rɪˈkruːt/', 'recruit', 'VERB', 'B1', 208, 'tuyển dụng', 'to hire new staff'),
+(@en, 'promote', '/prəˈmoʊt/', 'promote', 'VERB', 'B1', 209, 'thăng chức / quảng bá', 'to advance / advertise'),
+(@en, 'deadline', '/ˈdedlaɪn/', 'deadline', 'NOUN', 'B1', 210, 'hạn chót', 'the latest time'),
+(@en, 'colleague', '/ˈkɑːliːɡ/', 'colleague', 'NOUN', 'B1', 211, 'đồng nghiệp', 'a co-worker'),
+(@en, 'supervisor', '/ˈsuːpərvaɪzər/', 'supervisor', 'NOUN', 'B1', 212, 'cấp trên', 'a manager'),
+(@en, 'agenda', '/əˈdʒendə/', 'agenda', 'NOUN', 'B1', 213, 'chương trình họp', 'meeting plan'),
+(@en, 'negotiation', '/nɪˌɡoʊʃiˈeɪʃn/', 'negotiation', 'NOUN', 'B2', 214, 'đàm phán', 'discussion to reach deal'),
+(@en, 'feedback', '/ˈfiːdbæk/', 'feedback', 'NOUN', 'B1', 215, 'phản hồi', 'response/comments'),
+(@en, 'invoice', '/ˈɪnvɔɪs/', 'invoice', 'VERB', 'B2', 216, 'lập hóa đơn', 'to bill'),
+(@en, 'reimburse', '/ˌriːɪmˈbɜːrs/', 'reimburse', 'VERB', 'B2', 217, 'hoàn tiền', 'to pay back'),
+(@en, 'warranty', '/ˈwɔːrənti/', 'warranty', 'NOUN', 'B2', 218, 'bảo hành', 'guarantee for product'),
+(@en, 'logistics', '/ləˈdʒɪstɪks/', 'logistics', 'NOUN', 'B2', 219, 'hậu cần', 'organization of supply');
+
+-- ========== IELTS Academic (B2-C1) ==========
+INSERT INTO words (language_id, `text`, reading, romaji, pos, cefr_level, frequency_rank, meaning_vi, meaning_en) VALUES
+(@en, 'hypothesis', '/haɪˈpɑːθəsɪs/', 'hypothesis', 'NOUN', 'C1', 300, 'giả thuyết', 'a proposed explanation'),
+(@en, 'criterion', '/kraɪˈtɪriən/', 'criterion', 'NOUN', 'C1', 301, 'tiêu chí', 'a standard for judgment'),
+(@en, 'paradigm', '/ˈpærədaɪm/', 'paradigm', 'NOUN', 'C1', 302, 'mô hình', 'a typical example'),
+(@en, 'discrepancy', '/dɪsˈkrepənsi/', 'discrepancy', 'NOUN', 'C1', 303, 'sự khác biệt', 'a lack of compatibility'),
+(@en, 'correlation', '/ˌkɔːrəˈleɪʃn/', 'correlation', 'NOUN', 'C1', 304, 'sự tương quan', 'mutual relationship'),
+(@en, 'magnitude', '/ˈmæɡnɪtuːd/', 'magnitude', 'NOUN', 'C1', 305, 'độ lớn', 'great size or extent'),
+(@en, 'inherent', '/ɪnˈherənt/', 'inherent', 'ADJ', 'C1', 306, 'vốn có', 'naturally existing'),
+(@en, 'subsequent', '/ˈsʌbsɪkwənt/', 'subsequent', 'ADJ', 'C1', 307, 'tiếp theo', 'coming after'),
+(@en, 'arbitrary', '/ˈɑːrbɪtreri/', 'arbitrary', 'ADJ', 'C1', 308, 'tùy ý', 'based on random choice'),
+(@en, 'profound', '/prəˈfaʊnd/', 'profound', 'ADJ', 'C1', 309, 'sâu sắc', 'very deep'),
+(@en, 'meticulous', '/məˈtɪkjələs/', 'meticulous', 'ADJ', 'C1', 310, 'tỉ mỉ', 'very careful'),
+(@en, 'ubiquitous', '/juːˈbɪkwɪtəs/', 'ubiquitous', 'ADJ', 'C1', 311, 'có mặt khắp nơi', 'present everywhere'),
+(@en, 'scrutinize', '/ˈskruːtənaɪz/', 'scrutinize', 'VERB', 'C1', 312, 'xem xét kỹ', 'to examine closely'),
+(@en, 'exemplify', '/ɪɡˈzemplɪfaɪ/', 'exemplify', 'VERB', 'C1', 313, 'làm ví dụ', 'to be an example'),
+(@en, 'undermine', '/ˌʌndərˈmaɪn/', 'undermine', 'VERB', 'C1', 314, 'làm suy yếu', 'to weaken gradually'),
+(@en, 'mitigate', '/ˈmɪtɪɡeɪt/', 'mitigate', 'VERB', 'C1', 315, 'giảm nhẹ', 'to make less severe'),
+(@en, 'advocate', '/ˈædvəkeɪt/', 'advocate', 'VERB', 'C1', 316, 'ủng hộ, biện hộ', 'to publicly support'),
+(@en, 'jeopardize', '/ˈdʒepərdaɪz/', 'jeopardize', 'VERB', 'C1', 317, 'gây nguy hiểm', 'to put at risk'),
+(@en, 'discrepant', '/dɪsˈkrepənt/', 'discrepant', 'ADJ', 'C1', 318, 'không nhất quán', 'inconsistent'),
+(@en, 'predominantly', '/prɪˈdɑːmɪnəntli/', 'predominantly', 'ADV', 'C1', 319, 'chủ yếu', 'mainly');
+
+-- ----- Câu ví dụ tiếng Anh -----
+INSERT INTO word_examples (word_id, sentence, reading, translation, level_code, source) VALUES
+((SELECT id FROM words WHERE `text`='achievement' AND language_id=@en LIMIT 1),
+ 'Winning the gold medal was her greatest achievement.', NULL, 'Giành được huy chương vàng là thành tựu lớn nhất của cô ấy.', 'B1', 'curated'),
+((SELECT id FROM words WHERE `text`='environment' AND language_id=@en LIMIT 1),
+ 'We must protect the environment for future generations.', NULL, 'Chúng ta phải bảo vệ môi trường cho thế hệ tương lai.', 'B1', 'curated'),
+((SELECT id FROM words WHERE `text`='deadline' AND language_id=@en LIMIT 1),
+ 'The project deadline is next Friday.', NULL, 'Hạn chót của dự án là thứ Sáu tuần sau.', 'TOEIC', 'curated'),
+((SELECT id FROM words WHERE `text`='hypothesis' AND language_id=@en LIMIT 1),
+ 'The research supports our initial hypothesis.', NULL, 'Nghiên cứu này ủng hộ giả thuyết ban đầu của chúng tôi.', 'IELTS', 'curated'),
+((SELECT id FROM words WHERE `text`='mitigate' AND language_id=@en LIMIT 1),
+ 'New policies aim to mitigate climate change.', NULL, 'Các chính sách mới nhằm giảm nhẹ biến đổi khí hậu.', 'IELTS', 'curated'),
+((SELECT id FROM words WHERE `text`='collaborate' AND language_id=@en LIMIT 1),
+ 'Our team will collaborate with the marketing department.', NULL, 'Đội của chúng tôi sẽ hợp tác với phòng marketing.', 'TOEIC', 'curated');
