@@ -65,7 +65,18 @@ const getCharacter = async (req, res) => {
     `SELECT w.id, w.word, w.reading, w.meaning_vi FROM words w
      WHERE w.word LIKE ? LIMIT 10`, [`%${char}%`]
   );
-  res.json({ success: true, data: { ...rows[0], relatedWords: words } });
+
+  // 3.1 FIX: parse strokes JSON nếu có (KanjiVG paths) — trả về array string.
+  // Nếu DB không có cột strokes (migration 017 chưa apply), bỏ qua im lặng.
+  const row = rows[0];
+  let strokes = null;
+  if (row.strokes) {
+    try {
+      strokes = typeof row.strokes === 'string' ? JSON.parse(row.strokes) : row.strokes;
+    } catch (_) { strokes = null; }
+  }
+
+  res.json({ success: true, data: { ...row, strokes, relatedWords: words } });
 };
 
 module.exports = { getWords, searchWords, getWordById, getCharacter, getWordExamples };
