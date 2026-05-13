@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 
 const { authenticate } = require('../middleware/auth');
 
@@ -10,6 +11,20 @@ router.get('/health', (req, res) => {
 
 // Auth routes (publiques + /change-password protégée)
 router.use('/auth', require('./auth.routes'));
+
+// U13 FIX — POST /api/upload/avatar (multipart/form-data OR JSON avatarBase64).
+// Monté ici (pas dans auth.routes) pour suivre la spec `/api/upload/avatar`.
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+});
+const authCtrl = require('../controllers/auth.controller');
+router.post(
+  '/upload/avatar',
+  authenticate,
+  upload.single('avatar'),
+  authCtrl.uploadAvatar
+);
 
 // Protected routes
 router.use('/words', authenticate, require('./words.routes'));

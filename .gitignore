@@ -127,3 +127,6 @@ docker-compose.override.yml
 .grunt
 .lock-wscript
 
+# U13 — Uploaded avatars (runtime, not source)
+uploads/
+
