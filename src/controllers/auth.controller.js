@@ -116,23 +116,44 @@ const updateProfile = async (req, res) => {
   // stockés dans user_languages plutôt que users → on les accepte silencieusement
   // (pour ne pas retourner 400 quand seuls ces champs sont envoyés) et on met à
   // jour user_languages si les colonnes y existent.
+  // BUG C8 FIX: la table user_languages utilise language_id (FK → languages.id),
+  // pas lang_code; et la colonne de niveau s'appelle level_code, pas level.
+  // L'ancien code avait des try/catch silencieux qui masquaient ces erreurs.
   if (targetLanguage) {
     try {
-      await db.query(
-        `INSERT INTO user_languages (user_id, lang_code, is_primary)
-         VALUES (?, ?, 1)
-         ON DUPLICATE KEY UPDATE is_primary = 1`,
-        [req.user.id, targetLanguage]
+      const [lang] = await db.query(
+        'SELECT id FROM languages WHERE code = ?',
+        [targetLanguage]
       );
-    } catch (_) { /* ignore si schéma différent */ }
+      if (lang.length) {
+        // Réinitialise is_primary sur les autres langues de l'utilisateur,
+        // puis upsert celle-ci comme primary.
+        await db.query(
+          'UPDATE user_languages SET is_primary = 0 WHERE user_id = ?',
+          [req.user.id]
+        );
+        await db.query(
+          `INSERT INTO user_languages (user_id, language_id, is_primary)
+           VALUES (?, ?, 1)
+           ON DUPLICATE KEY UPDATE is_primary = 1`,
+          [req.user.id, lang[0].id]
+        );
+      } else {
+        console.warn('updateProfile: unknown targetLanguage code', targetLanguage);
+      }
+    } catch (e) {
+      console.error('user_languages upsert error:', e.message);
+    }
   }
   if (currentLevel) {
     try {
       await db.query(
-        `UPDATE user_languages SET level = ? WHERE user_id = ? AND is_primary = 1`,
+        `UPDATE user_languages SET level_code = ? WHERE user_id = ? AND is_primary = 1`,
         [currentLevel, req.user.id]
       );
-    } catch (_) { /* ignore */ }
+    } catch (e) {
+      console.error('user_languages level update error:', e.message);
+    }
   }
 
   if (!sets.length && !targetLanguage && !currentLevel) {

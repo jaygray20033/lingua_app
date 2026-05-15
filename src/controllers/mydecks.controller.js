@@ -4,14 +4,18 @@ const gamService = require('../services/gamification.service');
 
 // GET /api/my-decks — Decks de l'utilisateur (owned ou public)
 const list = async (req, res) => {
+  // BUG C10 FIX: ajouter language_code via JOIN
   const [rows] = await db.query(
     `SELECT d.*,
+       l.code AS language_code,
        (SELECT COUNT(*) FROM cards c WHERE c.deck_id = d.id) as card_count,
        (SELECT COUNT(*) FROM cards c
           JOIN flashcard_reviews fr ON fr.card_id = c.id
         WHERE c.deck_id = d.id AND fr.user_id = ? AND fr.next_review_at <= NOW()
           AND fr.state != 'SUSPENDED') as due_count
-     FROM decks d WHERE d.owner_id = ? OR d.is_public = 1
+     FROM decks d
+     LEFT JOIN languages l ON l.id = d.language_id
+     WHERE d.owner_id = ? OR d.is_public = 1
      ORDER BY d.id DESC`,
     [req.user.id, req.user.id]
   );
@@ -19,12 +23,21 @@ const list = async (req, res) => {
 };
 
 // POST /api/my-decks — Créer un nouveau deck
+// BUG C10 FIX: la table `decks` utilise `language_id` (FK → languages.id),
+// pas une colonne `language_code` directe. On lookup l'id depuis le code.
 const create = async (req, res) => {
   const { name, description, languageCode, isPublic } = req.body;
   if (!name) return res.status(400).json({ success: false, message: 'Tên bộ thẻ không được để trống' });
+
+  const code = languageCode || 'ja';
+  const [lang] = await db.query('SELECT id FROM languages WHERE code = ?', [code]);
+  if (!lang.length) {
+    return res.status(400).json({ success: false, message: `Ngôn ngữ '${code}' không hợp lệ` });
+  }
+
   const [result] = await db.query(
-    'INSERT INTO decks (owner_id, name, description, language_code, is_public) VALUES (?, ?, ?, ?, ?)',
-    [req.user.id, name, description || '', languageCode || 'ja', isPublic ? 1 : 0]
+    'INSERT INTO decks (owner_id, name, description, language_id, is_public) VALUES (?, ?, ?, ?, ?)',
+    [req.user.id, name, description || '', lang[0].id, isPublic ? 1 : 0]
   );
   res.status(201).json({ success: true, data: { id: result.insertId } });
 };
@@ -38,14 +51,23 @@ const getCards = async (req, res) => {
 };
 
 // POST /api/my-decks/:deckId/cards
+// BUG C9 FIX: la table `cards` a les colonnes `front_text`/`back_text`,
+// pas `front`/`back`.
 const addCard = async (req, res) => {
   const { deckId } = req.params;
   const { front, back, audioUrl } = req.body;
   if (!front || !back) {
     return res.status(400).json({ success: false, message: 'Mặt trước và mặt sau không được để trống' });
   }
+  // Vérifier que le deck appartient bien à l'utilisateur
+  const [owner] = await db.query(
+    'SELECT id FROM decks WHERE id = ? AND owner_id = ?', [deckId, req.user.id]
+  );
+  if (!owner.length) {
+    return res.status(403).json({ success: false, message: 'Bạn không có quyền thêm thẻ vào bộ này' });
+  }
   const [result] = await db.query(
-    'INSERT INTO cards (deck_id, front, back, audio_url) VALUES (?, ?, ?, ?)',
+    'INSERT INTO cards (deck_id, front_text, back_text, audio_url) VALUES (?, ?, ?, ?)',
     [deckId, front, back, audioUrl || null]
   );
   res.status(201).json({ success: true, data: { id: result.insertId } });
@@ -54,8 +76,12 @@ const addCard = async (req, res) => {
 // 1.6 — POST /api/my-decks/:deckId/start
 const startSession = async (req, res) => {
   const { deckId } = req.params;
+  // BUG C10 FIX: lookup language_code via JOIN avec la table languages
   const [deck] = await db.query(
-    'SELECT id, name, language_code FROM decks WHERE id = ? AND (owner_id = ? OR is_public = 1)',
+    `SELECT d.id, d.name, l.code AS language_code
+     FROM decks d
+     LEFT JOIN languages l ON l.id = d.language_id
+     WHERE d.id = ? AND (d.owner_id = ? OR d.is_public = 1)`,
     [deckId, req.user.id]
   );
   if (!deck.length) {

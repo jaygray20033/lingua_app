@@ -277,7 +277,7 @@ const getCoursePath = async (req, res) => {
     );
     for (const unit of units) {
       const [lessons] = await db.query(
-        `SELECT l.id, l.title, l.lesson_type, l.xp_reward, l.is_free_preview,
+        `SELECT l.id, l.title, l.\`type\` AS lesson_type, l.xp_reward, l.is_free_preview,
           (SELECT status FROM lesson_attempts WHERE lesson_id = l.id AND user_id = ?
             ORDER BY id DESC LIMIT 1) as last_status
          FROM lessons l WHERE l.unit_id = ? ORDER BY l.order_index`,
@@ -293,23 +293,59 @@ const getCoursePath = async (req, res) => {
 // DELETE /api/courses/:courseId/enroll
 const unenrollCourse = async (req, res) => {
   const { courseId } = req.params;
+  // BUG C5 FIX: enum chỉ có 'ACTIVE','COMPLETED','DROPPED' — dùng 'DROPPED' thay vì 'CANCELLED'
   await db.query(
-    "UPDATE enrollments SET status = 'CANCELLED' WHERE user_id = ? AND course_id = ?",
+    "UPDATE enrollments SET status = 'DROPPED' WHERE user_id = ? AND course_id = ?",
     [req.user.id, courseId]
   );
   res.json({ success: true, message: 'Đã huỷ đăng ký khoá học' });
 };
 
 // GET /api/enrollments — 1.2 — Khoá học của tôi
+// BUG C2 + L1 FIX: alias thumbnail_url AS cover_url; bổ sung progress/next_lesson_id/...
 const myEnrollments = async (req, res) => {
+  const uid = req.user.id;
   const [rows] = await db.query(
-    `SELECT e.*, c.title, c.target_lang_id, c.cover_url, l.code as lang_code, l.flag_emoji
+    `SELECT e.*, c.title, c.target_lang_id,
+       c.thumbnail_url AS cover_url,
+       l.code as lang_code, l.flag_emoji,
+       e.progress_percent AS progress,
+       (SELECT COUNT(*) FROM lessons l2
+          JOIN units u ON u.id = l2.unit_id
+          JOIN sections s ON s.id = u.section_id
+          WHERE s.course_id = c.id) AS total_lessons,
+       (SELECT COUNT(DISTINCT la.lesson_id) FROM lesson_attempts la
+          JOIN lessons l2 ON l2.id = la.lesson_id
+          JOIN units u ON u.id = l2.unit_id
+          JOIN sections s ON s.id = u.section_id
+          WHERE s.course_id = c.id AND la.user_id = ? AND la.status='COMPLETED') AS completed_lessons,
+       (SELECT l2.id FROM lessons l2
+          JOIN units u ON u.id = l2.unit_id
+          JOIN sections s ON s.id = u.section_id
+          WHERE s.course_id = c.id
+            AND l2.id NOT IN (
+              SELECT lesson_id FROM lesson_attempts WHERE user_id=? AND status='COMPLETED'
+            )
+          ORDER BY s.order_index, u.order_index, l2.order_index LIMIT 1) AS next_lesson_id,
+       (SELECT l2.title FROM lessons l2
+          JOIN units u ON u.id = l2.unit_id
+          JOIN sections s ON s.id = u.section_id
+          WHERE s.course_id = c.id
+            AND l2.id NOT IN (
+              SELECT lesson_id FROM lesson_attempts WHERE user_id=? AND status='COMPLETED'
+            )
+          ORDER BY s.order_index, u.order_index, l2.order_index LIMIT 1) AS next_lesson_title,
+       (SELECT MAX(started_at) FROM lesson_attempts la
+          JOIN lessons l2 ON l2.id = la.lesson_id
+          JOIN units u ON u.id = l2.unit_id
+          JOIN sections s ON s.id = u.section_id
+          WHERE s.course_id = c.id AND la.user_id = ?) AS last_accessed_at
      FROM enrollments e
      JOIN courses c ON c.id = e.course_id
      LEFT JOIN languages l ON l.id = c.target_lang_id
      WHERE e.user_id = ? AND e.status = 'ACTIVE'
-     ORDER BY e.id DESC`,
-    [req.user.id]
+     ORDER BY last_accessed_at DESC, e.id DESC`,
+    [uid, uid, uid, uid, uid]
   );
   res.json({ success: true, data: rows });
 };
@@ -318,7 +354,7 @@ const myEnrollments = async (req, res) => {
 const getReviewQueue = async (req, res) => {
   // Bài học đã hoàn thành >= 7 ngày trước, hoặc score < 80%
   const [rows] = await db.query(
-    `SELECT DISTINCT l.id, l.title, l.lesson_type, l.xp_reward,
+    `SELECT DISTINCT l.id, l.title, l.\`type\` AS lesson_type, l.xp_reward,
        la.score_percent, la.completed_at,
        u.title as unit_title,
        (CASE

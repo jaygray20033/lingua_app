@@ -27,6 +27,18 @@ const authenticate = async (req, res, next) => {
       }
       user = rows[0];
       await cache.set(cacheKey, JSON.stringify(user), { EX: 300 });
+
+      // BUG L3 FIX: pour les users créés avant le fix register (ou via seed SQL),
+      // s'assurer qu'une ligne user_gamification existe — sinon updateStreak()
+      // sort en early-return et le streak reste bloqué à 0.
+      try {
+        await db.query(
+          'INSERT IGNORE INTO user_gamification (user_id) VALUES (?)',
+          [user.id]
+        );
+      } catch (e) {
+        console.error('auth middleware: ensure user_gamification failed:', e.message);
+      }
     }
     req.user = user;
     next();

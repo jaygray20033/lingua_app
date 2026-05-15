@@ -28,7 +28,11 @@ const register = async ({ email, password, displayName, nativeLanguage = 'vi' })
   );
   const userId = result.insertId;
 
-  await db.query('INSERT IGNORE INTO user_gamification (user_id) VALUES (?)', [userId]).catch(() => {});
+  // BUG L3 FIX: ne plus avaler silencieusement l'erreur d'insertion gamification.
+  // Si la ligne n'est pas créée ici, updateStreak() retourne early et le streak
+  // reste à 0 pour toujours. On laisse l'erreur remonter pour faire échouer
+  // l'inscription proprement plutôt que de créer un user à moitié configuré.
+  await db.query('INSERT IGNORE INTO user_gamification (user_id) VALUES (?)', [userId]);
 
   // BUG B18 FIX: Insert into user_languages with primary language=1 (English by default).
   // Without this row, setDailyGoal/getStats queries that join user_languages on
@@ -36,7 +40,7 @@ const register = async ({ email, password, displayName, nativeLanguage = 'vi' })
   await db.query(
     'INSERT IGNORE INTO user_languages (user_id, language_id, is_primary, daily_xp_goal) VALUES (?, 1, 1, 20)',
     [userId]
-  ).catch(() => {});
+  );
 
   const tokens = sign({ userId, email, role: 'USER' });
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
