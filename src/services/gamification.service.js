@@ -122,23 +122,38 @@ const loseHeart = async (userId) => {
   if (!rows.length) return;
 
   // Premium users have unlimited hearts
-  if (rows[0].role === 'PREMIUM') return rows[0].hearts;
+  if (rows[0].role === 'PREMIUM') return { hearts: rows[0].hearts, outOfHearts: false };
 
   // BUG B19 FIX: Return gracefully instead of throwing — Android expects { hearts: N }
   if (rows[0].hearts <= 0) {
     return { hearts: 0, outOfHearts: true };
   }
 
-  await db.query(
-    'UPDATE user_gamification SET hearts = hearts - 1 WHERE user_id = ?',
+  // BUG L4 FIX: Atomic decrement with floor at 0 + WHERE hearts > 0 guard
+  // pour empêcher les valeurs négatives en cas de race condition
+  // (2 requêtes /hearts/lose en parallèle quand hearts == 1).
+  const [result] = await db.query(
+    `UPDATE user_gamification
+     SET hearts = GREATEST(hearts - 1, 0)
+     WHERE user_id = ? AND hearts > 0`,
     [userId]
   );
-  await db.query(
-    'INSERT INTO heart_logs (user_id, delta, reason) VALUES (?, -1, ?)',
-    [userId, 'WRONG_ANSWER']
-  );
 
-  const newHearts = rows[0].hearts - 1;
+  // Si aucune ligne n'a été modifiée (hearts déjà à 0 du fait d'une race),
+  // on évite de logger une perte fantôme.
+  if (result.affectedRows > 0) {
+    await db.query(
+      'INSERT INTO heart_logs (user_id, delta, reason) VALUES (?, -1, ?)',
+      [userId, 'WRONG_ANSWER']
+    );
+  }
+
+  // Relire la valeur réelle depuis la DB pour refléter l'état exact
+  const [fresh] = await db.query(
+    'SELECT hearts FROM user_gamification WHERE user_id = ?',
+    [userId]
+  );
+  const newHearts = fresh.length ? fresh[0].hearts : 0;
   return { hearts: newHearts, outOfHearts: newHearts <= 0 };
 };
 

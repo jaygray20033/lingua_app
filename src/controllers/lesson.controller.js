@@ -266,11 +266,20 @@ const getEnrollment = async (req, res) => {
 };
 
 // 1.5 — GET /api/courses/:courseId/path (lộ trình học)
+// BUG L6 FIX: calculer `locked` séquentiellement — un lesson est verrouillé
+// tant que le précédent n'a pas été complété (sauf is_free_preview).
+// Android `CoursePath.PathLesson.isLocked()` lit ce champ pour afficher l'icône cadenas.
 const getCoursePath = async (req, res) => {
   const { courseId } = req.params;
   const [sections] = await db.query(
     'SELECT * FROM sections WHERE course_id = ? ORDER BY order_index', [courseId]
   );
+
+  // On parcourt tout le cours dans l'ordre (section → unit → lesson) et on
+  // maintient un flag `prevCompleted` global pour propager le verrouillage
+  // entre units et sections.
+  let prevCompleted = true;
+
   for (const section of sections) {
     const [units] = await db.query(
       'SELECT * FROM units WHERE section_id = ? ORDER BY order_index', [section.id]
@@ -283,7 +292,37 @@ const getCoursePath = async (req, res) => {
          FROM lessons l WHERE l.unit_id = ? ORDER BY l.order_index`,
         [req.user.id, unit.id]
       );
-      unit.lessons = lessons;
+
+      unit.lessons = lessons.map((l) => {
+        const completed = l.last_status === 'COMPLETED';
+        // Un lesson est déverrouillé si :
+        //   - le lesson précédent est COMPLETED, OU
+        //   - il est marqué free_preview (ex: 1ère leçon de démo)
+        const locked = !completed && !prevCompleted && !l.is_free_preview;
+        const status = completed
+          ? 'COMPLETED'
+          : locked
+            ? 'LOCKED'
+            : (l.last_status === 'IN_PROGRESS' ? 'IN_PROGRESS' : 'AVAILABLE');
+
+        // Propager pour le lesson suivant
+        prevCompleted = completed;
+
+        return {
+          ...l,
+          type: l.lesson_type,           // alias pour compatibilité Android
+          completed,
+          locked,
+          status,
+        };
+      });
+
+      // Calculer le pourcentage de progression de l'unit pour l'UI Android
+      const total = unit.lessons.length;
+      const done = unit.lessons.filter((x) => x.completed).length;
+      unit.progress_percent = total > 0 ? Math.round((done / total) * 100) : 0;
+      unit.completed_lessons = done;
+      unit.total_lessons = total;
     }
     section.units = units;
   }

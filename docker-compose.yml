@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   mysql:
@@ -15,7 +15,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./migrations/init.sql:/docker-entrypoint-initdb.d/01_init.sql
-      - ./migrations/002_schema_extensions.sql:/docker-entrypoint-initdb.d/02_schema_extensions.sql
     command: >
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
@@ -50,12 +49,16 @@ services:
       DB_PASS: lingua_pass123
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: lingua_jwt_secret_change_in_prod_2026
-      JWT_EXPIRES_IN: 15m
-      REFRESH_TOKEN_EXPIRES_IN: 7d
-      OPENROUTER_API_KEY: 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
-      OPENROUTER_BASE_URL: https://openrouter.ai/api/v1
-      AI_MODEL: openai/gpt-4o
+      # BUG R1 FIX: Ne plus hardcoder les secrets dans docker-compose.yml.
+      # Charger via .env (fichier listé dans .gitignore) ou variables d'environnement.
+      # Si une clé est exposée en clair dans l'historique git, REVOQUEZ-la immédiatement
+      # côté provider et purgez l'historique avec git filter-repo / BFG Repo-Cleaner.
+      JWT_SECRET: ${JWT_SECRET:-lingua_jwt_secret_change_in_prod_2026}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      REFRESH_TOKEN_EXPIRES_IN: ${REFRESH_TOKEN_EXPIRES_IN:-7d}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      AI_MODEL: ${AI_MODEL:-openai/gpt-4o}
       PORT: 3000
     depends_on:
       mysql:
